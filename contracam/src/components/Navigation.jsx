@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaHome, FaHistory, FaCog, FaSignOutAlt, FaUser, FaBell } from 'react-icons/fa';
 
-const Navigation = () => {
+const Navigation = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -11,7 +11,8 @@ const Navigation = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/login');
+    setIsAuthenticated(false); // Update the authentication state
+    navigate('/login'); // Redirect to the login page
   };
   
   const user = JSON.parse(localStorage.getItem('user') || '{"name": "User", "email": "user@example.com"}');

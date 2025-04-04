@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaFileUpload, FaSearch, FaFilter, FaExclamationTriangle } from 'react-icons/fa';
 import Navigation from '../components/Navigation';
+import sampleImage from '../assets/sample.png'; // Import the sample image
 
 const Dashboard = () => {
   const [contracts, setContracts] = useState([]);
@@ -24,7 +25,7 @@ const Dashboard = () => {
         title: 'Employment Contract',
         uploadDate: '2025-04-01',
         status: 'Completed',
-        thumbnail: '/api/placeholder/200/280',
+        thumbnail: sampleImage, // Use the sample image
         alertsCount: 2
       },
       {
@@ -32,7 +33,7 @@ const Dashboard = () => {
         title: 'Lease Agreement',
         uploadDate: '2025-04-02',
         status: 'Completed',
-        thumbnail: '/api/placeholder/200/280',
+        thumbnail: sampleImage, // Use the sample image
         alertsCount: 0
       },
       {
@@ -40,7 +41,7 @@ const Dashboard = () => {
         title: 'Service Agreement',
         uploadDate: '2025-04-03',
         status: 'Processing',
-        thumbnail: '/api/placeholder/200/280',
+        thumbnail: sampleImage, // Use the sample image
         alertsCount: 0
       }
     ];

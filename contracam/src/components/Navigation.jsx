@@ -12,7 +12,7 @@ const Navigation = ({ setIsAuthenticated }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setIsAuthenticated(false); // Update the authentication state
-    navigate('/login'); // Redirect to the login page
+    navigate('/login', { replace: true }); // Redirect to the login page instantly
   };
   
   const user = JSON.parse(localStorage.getItem('user') || '{"name": "User", "email": "user@example.com"}');

@@ -43,6 +43,12 @@ const Login = ({ setIsAuthenticated = () => {} }) => {
     navigate('/dashboard');
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login'); // Redirects to the login page
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">

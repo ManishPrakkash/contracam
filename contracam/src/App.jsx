@@ -6,6 +6,7 @@ import UploadContract from './pages/UploadContract';
 import ContractHistory from './pages/ContractHistory';
 import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
+import Navigation from './components/Navigation';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

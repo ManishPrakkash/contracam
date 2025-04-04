@@ -78,7 +78,7 @@ const Navigation = () => {
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
                   <span className="sr-only">Open user menu</span>
-                  <div className="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white">
+                  <div className="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-black">
                     {user.name.charAt(0)}
                   </div>
                 </button>

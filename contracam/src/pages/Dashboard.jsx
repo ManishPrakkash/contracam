@@ -1,6 +1,6 @@
 // src/pages/Dashboard.jsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaFileUpload, FaSearch, FaFilter, FaExclamationTriangle } from 'react-icons/fa';
 import Navigation from '../components/Navigation';
 
@@ -12,6 +12,8 @@ const Dashboard = () => {
     alertsFound: 0,
     pendingContracts: 0
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // In a real app, this would be an API call
@@ -52,6 +54,12 @@ const Dashboard = () => {
     });
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
   const filteredContracts = contracts.filter(contract => 
     contract.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -59,11 +67,10 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation />
-      
       <div className="py-10">
-        <header>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold leading-tight text-gray-900">Dashboard</h1>
+        <header className="relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 className="text-3xl font-bold leading-tight text-black-900">Dashboard</h1>
           </div>
         </header>
         

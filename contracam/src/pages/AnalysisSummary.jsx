@@ -273,7 +273,9 @@ const AnalysisSummary = () => {
                     Uploaded: {contract.uploadDate} • {contract.pages} Pages
                   </p>
                   <div className="mt-2 flex items-center">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mr-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      contract.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                    } mr-2`}>
                       {contract.status}
                     </span>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -410,12 +412,24 @@ const AnalysisSummary = () => {
             <div className="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
               <div className="px-4 py-5 sm:px-6 flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="bg-green-100 rounded-full p-2 mr-3">
-                    <FaCheck className="h-5 w-5 text-green-600" />
+                  <div className={`rounded-full p-2 mr-3 ${
+                    contract.status === 'Processing' ? 'bg-yellow-100' : 'bg-green-100'
+                  }`}>
+                    {contract.status === 'Processing' ? (
+                      <FaExclamationTriangle className="h-5 w-5 text-yellow-600" />
+                    ) : (
+                      <FaCheck className="h-5 w-5 text-green-600" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="text-md font-medium text-gray-900">Contract Analyzed Successfully</h3>
-                    <p className="text-sm text-gray-500">This analysis was completed on {contract.uploadDate} with {contract.confidenceScore}% confidence.</p>
+                    <h3 className="text-md font-medium text-gray-900">
+                      {contract.status === 'Processing' ? 'Contract is Processing' : 'Contract Analyzed Successfully'}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {contract.status === 'Processing'
+                        ? 'This contract is currently being processed. Please check back later.'
+                        : `This analysis was completed on ${contract.uploadDate} with ${contract.confidenceScore}% confidence.`}
+                    </p>
                   </div>
                 </div>
               </div>

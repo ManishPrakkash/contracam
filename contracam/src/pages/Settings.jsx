@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navigation from '../components/Navigation';
 
 const Settings = () => {
+  const [profileImage, setProfileImage] = useState('./assets/pic.jpg');
+  const [previewImage, setPreviewImage] = useState(profileImage);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setPreviewImage(imageUrl);
+    }
+  };
+
+  const handleSaveImage = () => {
+    setProfileImage(previewImage);
+    alert('Profile picture updated successfully!');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation />
@@ -11,7 +27,7 @@ const Settings = () => {
             <h1 className="text-white text-2xl font-bold">Profile</h1>
             <div className="absolute top-[-40px] right-8 w-20 h-20 bg-white rounded-full overflow-hidden shadow-md">
               <img
-                src="https://via.placeholder.com/150"
+                src={previewImage}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
@@ -49,10 +65,24 @@ const Settings = () => {
                 <span>••••••••</span>
               </div>
             </div>
-            <div className="mt-6 flex justify-end">
-              <button className="bg-black text-white px-4 py-2 rounded-md shadow">
-                Edit
-              </button>
+            <div className="mt-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Update Profile Picture
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+              />
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={handleSaveImage}
+                  className="bg-black text-white px-4 py-2 rounded-md shadow hover:bg-gray-800"
+                >
+                  Edit
+                </button>
+              </div>
             </div>
           </div>
         </div>

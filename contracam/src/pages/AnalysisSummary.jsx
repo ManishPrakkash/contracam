@@ -21,62 +21,156 @@ const AnalysisSummary = () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Mock contract data
-        const mockContract = {
-          id,
-          title: id === '1' ? 'Employment Contract' : id === '2' ? 'Lease Agreement' : 'Service Agreement',
-          uploadDate: '2025-04-01',
-          status: 'Completed',
-          pages: 5,
-          thumbnail: sampleImage,
-          confidenceScore: 98,
-          summary: 'This is a standard employment contract between Employer Inc. and an employee. It includes terms for compensation, benefits, work responsibilities, and termination conditions.',
-          keyPoints: [
-            'Employment term begins on May 1, 2025 and continues until terminated',
-            'Base salary of $85,000 per year, paid bi-weekly',
-            'Two weeks of paid vacation annually',
-            '401(k) retirement plan with 3% employer match',
-            'Confidentiality and non-compete clauses included'
-          ],
-          detailedSections: [
-            {
-              title: 'Compensation and Benefits',
-              content: 'Employee will receive a base salary of $85,000 per year, paid bi-weekly. Benefits include health insurance (medical, dental, vision), two weeks of paid vacation annually, sick leave as needed, and a 401(k) retirement plan with 3% employer match.',
-              alerts: []
-            },
-            {
-              title: 'Term and Termination',
-              content: 'Employment begins on May 1, 2025 and continues until terminated by either party. Either party may terminate the employment with 2 weeks written notice. Employer may terminate without notice for cause.',
-              alerts: []
-            },
-            {
-              title: 'Non-Compete Clause',
-              content: 'Employee agrees not to work for any direct competitor for a period of 12 months after termination of employment within a 50-mile radius of Employer\'s business locations.',
-              alerts: [
-                {
-                  level: 'warning',
-                  message: 'Non-compete clauses may have enforceability limitations in some jurisdictions'
-                }
-              ]
-            },
-            {
-              title: 'Intellectual Property',
-              content: 'All work product, inventions, and intellectual property created during employment belongs to the Employer. Employee agrees to assign all rights to the Employer.',
-              alerts: []
-            },
-            {
-              title: 'Dispute Resolution',
-              content: 'Any disputes arising from this agreement will be resolved through binding arbitration rather than court proceedings.',
-              alerts: [
-                {
-                  level: 'critical',
-                  message: 'Mandatory arbitration clause limits your right to pursue legal action in court'
-                }
-              ]
-            }
-          ]
-        };
+        const mockContracts = [
+          {
+            id: '1',
+            title: 'Employment Contract',
+            uploadDate: '2025-04-01',
+            status: 'Completed',
+            pages: 5,
+            thumbnail: sampleImage,
+            confidenceScore: 98,
+            alertsCount: 2,
+            summary: 'This is a standard employment contract between Employer Inc. and an employee. It includes terms for compensation, benefits, work responsibilities, and termination conditions.',
+            keyPoints: [
+              'Employment term begins on May 1, 2025 and continues until terminated',
+              'Base salary of $85,000 per year, paid bi-weekly',
+              'Two weeks of paid vacation annually',
+              '401(k) retirement plan with 3% employer match',
+              'Confidentiality and non-compete clauses included'
+            ],
+            detailedSections: [
+              {
+                title: 'Compensation and Benefits',
+                content: 'Employee will receive a base salary of $85,000 per year, paid bi-weekly. Benefits include health insurance (medical, dental, vision), two weeks of paid vacation annually, sick leave as needed, and a 401(k) retirement plan with 3% employer match.',
+                alerts: []
+              },
+              {
+                title: 'Term and Termination',
+                content: 'Employment begins on May 1, 2025 and continues until terminated by either party. Either party may terminate the employment with 2 weeks written notice. Employer may terminate without notice for cause.',
+                alerts: []
+              },
+              {
+                title: 'Non-Compete Clause',
+                content: 'Employee agrees not to work for any direct competitor for a period of 12 months after termination of employment within a 50-mile radius of Employer\'s business locations.',
+                alerts: [
+                  {
+                    level: 'warning',
+                    message: 'Non-compete clauses may have enforceability limitations in some jurisdictions'
+                  }
+                ]
+              },
+              {
+                title: 'Intellectual Property',
+                content: 'All work product, inventions, and intellectual property created during employment belongs to the Employer. Employee agrees to assign all rights to the Employer.',
+                alerts: []
+              },
+              {
+                title: 'Dispute Resolution',
+                content: 'Any disputes arising from this agreement will be resolved through binding arbitration rather than court proceedings.',
+                alerts: [
+                  {
+                    level: 'critical',
+                    message: 'Mandatory arbitration clause limits your right to pursue legal action in court'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: '2',
+            title: 'Lease Agreement',
+            uploadDate: '2025-04-02',
+            status: 'Completed',
+            pages: 3,
+            thumbnail: sampleImage,
+            confidenceScore: 95,
+            alertsCount: 0,
+            summary: 'This is a lease agreement between a landlord and a tenant. It includes terms for rent, security deposit, and maintenance responsibilities.',
+            keyPoints: [
+              'Lease term begins on June 1, 2025 and ends on May 31, 2026',
+              'Monthly rent of $1,200, due on the 1st of each month',
+              'Security deposit of $1,200 required',
+              'Tenant responsible for utilities and minor maintenance',
+              'Landlord responsible for major repairs'
+            ],
+            detailedSections: [
+              {
+                title: 'Rent and Payment',
+                content: 'Tenant agrees to pay $1,200 per month in rent, due on the 1st of each month. Late payments will incur a $50 fee.',
+                alerts: []
+              },
+              {
+                title: 'Security Deposit',
+                content: 'Tenant will provide a security deposit of $1,200, which will be returned at the end of the lease term, less any deductions for damages.',
+                alerts: []
+              },
+              {
+                title: 'Maintenance Responsibilities',
+                content: 'Tenant is responsible for minor maintenance, such as changing light bulbs and unclogging drains. Landlord is responsible for major repairs, such as plumbing and electrical issues.',
+                alerts: []
+              },
+              {
+                title: 'Termination and Renewal',
+                content: 'Lease will automatically terminate on May 31, 2026. Tenant may request renewal with 30 days written notice.',
+                alerts: []
+              },
+              {
+                title: 'Dispute Resolution',
+                content: 'Any disputes arising from this agreement will be resolved through mediation before pursuing legal action.',
+                alerts: []
+              }
+            ]
+          },
+          {
+            id: '3',
+            title: 'Service Agreement',
+            uploadDate: '2025-04-03',
+            status: 'Processing',
+            pages: 7,
+            thumbnail: sampleImage,
+            confidenceScore: 90,
+            alertsCount: 0,
+            summary: 'This is a service agreement between a client and a service provider. It includes terms for scope of work, payment, and confidentiality.',
+            keyPoints: [
+              'Service provider will deliver services as outlined in the attached scope of work',
+              'Client agrees to pay $5,000 upon completion of services',
+              'Confidentiality agreement prohibits disclosure of client information',
+              'Agreement is effective from April 1, 2025 to March 31, 2026',
+              'Either party may terminate the agreement with 30 days written notice'
+            ],
+            detailedSections: [
+              {
+                title: 'Scope of Work',
+                content: 'Service provider will deliver services as outlined in the attached scope of work. Any changes to the scope must be agreed upon in writing.',
+                alerts: []
+              },
+              {
+                title: 'Payment Terms',
+                content: 'Client agrees to pay $5,000 upon completion of services. Late payments will incur a 5% fee.',
+                alerts: []
+              },
+              {
+                title: 'Confidentiality',
+                content: 'Both parties agree to maintain confidentiality of all information disclosed during the term of this agreement.',
+                alerts: []
+              },
+              {
+                title: 'Termination',
+                content: 'Either party may terminate the agreement with 30 days written notice. Termination does not relieve either party of obligations incurred prior to termination.',
+                alerts: []
+              },
+              {
+                title: 'Dispute Resolution',
+                content: 'Any disputes arising from this agreement will be resolved through arbitration.',
+                alerts: []
+              }
+            ]
+          }
+        ];
 
-        setContract(mockContract);
+        const contractDetails = mockContracts.find(contract => contract.id === id);
+        setContract(contractDetails);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching contract details:', error);
@@ -179,7 +273,9 @@ const AnalysisSummary = () => {
                     Uploaded: {contract.uploadDate} • {contract.pages} Pages
                   </p>
                   <div className="mt-2 flex items-center">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mr-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      contract.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                    } mr-2`}>
                       {contract.status}
                     </span>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -316,12 +412,24 @@ const AnalysisSummary = () => {
             <div className="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
               <div className="px-4 py-5 sm:px-6 flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="bg-green-100 rounded-full p-2 mr-3">
-                    <FaCheck className="h-5 w-5 text-green-600" />
+                  <div className={`rounded-full p-2 mr-3 ${
+                    contract.status === 'Processing' ? 'bg-yellow-100' : 'bg-green-100'
+                  }`}>
+                    {contract.status === 'Processing' ? (
+                      <FaExclamationTriangle className="h-5 w-5 text-yellow-600" />
+                    ) : (
+                      <FaCheck className="h-5 w-5 text-green-600" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="text-md font-medium text-gray-900">Contract Analyzed Successfully</h3>
-                    <p className="text-sm text-gray-500">This analysis was completed on {contract.uploadDate} with {contract.confidenceScore}% confidence.</p>
+                    <h3 className="text-md font-medium text-gray-900">
+                      {contract.status === 'Processing' ? 'Contract is Processing' : 'Contract Analyzed Successfully'}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {contract.status === 'Processing'
+                        ? 'This contract is currently being processed. Please check back later.'
+                        : `This analysis was completed on ${contract.uploadDate} with ${contract.confidenceScore}% confidence.`}
+                    </p>
                   </div>
                 </div>
               </div>

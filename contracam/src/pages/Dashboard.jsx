@@ -221,7 +221,7 @@ const Dashboard = () => {
                       </div>
                       <div className="bg-gray-50 px-5 py-3">
                         <Link
-                          to={`/analysis/${contract.id}`}
+                          to={`/analysis-summary/${contract.id}`} // Updated path to match AnalysisSummary route
                           className="text-sm font-medium text-primary-600 hover:text-primary-500"
                         >
                           View Summary <span aria-hidden="true">&rarr;</span>

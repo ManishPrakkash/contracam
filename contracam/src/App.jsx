@@ -7,6 +7,7 @@ import ContractHistory from './pages/ContractHistory';
 import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navigation from './components/Navigation';
+import AnalysisSummary from './pages/AnalysisSummary';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,6 +47,11 @@ function App() {
         <Route path="/settings" element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>
             <Settings />
+          </ProtectedRoute>
+        } />
+        <Route path="/analysis-summary/:id" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <AnalysisSummary />
           </ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />

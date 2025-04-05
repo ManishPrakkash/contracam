@@ -6,7 +6,7 @@ const ContractHistory = () => {
     <div className="min-h-screen bg-gray-100">
       <Navigation />
       <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">Contract History Page</h1>
+        <h1 className="text-2xl font-bold">Loading...</h1>
       </div>
     </div>
   );

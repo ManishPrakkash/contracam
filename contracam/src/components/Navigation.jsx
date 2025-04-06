@@ -12,6 +12,7 @@ const Navigation = ({ setIsAuthenticated }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setIsAuthenticated(false); // Update the authentication state
+    setIsProfileOpen(false); // Close the profile dropdown
     navigate('/login', { replace: true }); // Redirect to the login page instantly
   };
   
@@ -74,7 +75,7 @@ const Navigation = ({ setIsAuthenticated }) => {
               <div>
                 <button
                   type="button"
-                  className="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  className="max-w-xs bg-white flex items-center text-sm rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" // Added border
                   id="user-menu-button"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
@@ -100,7 +101,7 @@ const Navigation = ({ setIsAuthenticated }) => {
                     <FaUser className="inline mr-2" /> Your Profile
                   </Link>
                   <button
-                    onClick={handleLogout}
+                    onClick={handleLogout} // Ensure handleLogout is properly called
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     role="menuitem"
                   >

@@ -8,6 +8,7 @@ import sampleImage from '../assets/sample.png'; // Import the sample image
 const Dashboard = () => {
   const [contracts, setContracts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState(''); // Add state for filter status
   const [stats, setStats] = useState({
     totalContracts: 0,
     alertsFound: 0,
@@ -61,8 +62,15 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  const toggleFilter = () => {
+    setFilterStatus((prevStatus) => 
+      prevStatus === 'Processing' ? 'Completed' : prevStatus === 'Completed' ? '' : 'Processing'
+    ); // Toggle between "Processing", "Completed", and "Show All"
+  };
+
   const filteredContracts = contracts.filter(contract => 
-    contract.title.toLowerCase().includes(searchTerm.toLowerCase())
+    contract.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (filterStatus === '' || contract.status === filterStatus) // Apply filter
   );
 
   return (
@@ -162,8 +170,11 @@ const Dashboard = () => {
               </div>
               
               <div className="flex space-x-2">
-                <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                  <FaFilter className="mr-2" /> Filter
+                <button
+                  onClick={toggleFilter} // Toggle filter status
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                  <FaFilter className="mr-2" /> {filterStatus === 'Processing' ? 'Show Completed' : filterStatus === 'Completed' ? 'Show All' : 'Show Processing'}
                 </button>
                 
                 <Link

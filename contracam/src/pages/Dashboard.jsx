@@ -18,43 +18,26 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    // Mock data for now
-    const mockContracts = [
-      {
-        id: '1',
-        title: 'Employment Contract',
-        uploadDate: '2025-04-01',
+    localStorage.setItem('lastVisitedPage', 'dashboard'); // Store the current page in localStorage
+    const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
+    const mockContracts = history
+      .map((item, index) => ({
+        id: `${index + 1}`,
+        title: item.name,
+        uploadDate: new Date().toLocaleDateString(),
         status: 'Completed',
-        thumbnail: sampleImage, // Use the sample image
-        alertsCount: 2
-      },
-      {
-        id: '2',
-        title: 'Lease Agreement',
-        uploadDate: '2025-04-02',
-        status: 'Completed',
-        thumbnail: sampleImage, // Use the sample image
-        alertsCount: 0
-      },
-      {
-        id: '3',
-        title: 'Service Agreement',
-        uploadDate: '2025-04-03',
-        status: 'Processing',
-        thumbnail: sampleImage, // Use the sample image
-        alertsCount: 0
-      }
-    ];
-    
+        thumbnail: item.thumbnail, // Use the saved thumbnail
+        alertsCount: 0,
+        summary: item.text.slice(0, 100) + '...', // Short summary
+      }))
+      .reverse(); // Reverse to show most recently added contracts first
     setContracts(mockContracts);
-    
     setStats({
       totalContracts: mockContracts.length,
-      alertsFound: mockContracts.reduce((total, contract) => total + contract.alertsCount, 0),
-      pendingContracts: mockContracts.filter(c => c.status === 'Processing').length
+      alertsFound: 0,
+      pendingContracts: 0,
     });
-  }, []);
+  }, [localStorage.getItem('ocrHistory')]); // Re-run when history changes
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -68,10 +51,12 @@ const Dashboard = () => {
     ); // Toggle between "Processing", "Completed", and "Show All"
   };
 
-  const filteredContracts = contracts.filter(contract => 
-    contract.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (filterStatus === '' || contract.status === filterStatus) // Apply filter
-  );
+  const filteredContracts = contracts
+    .filter(contract => 
+      contract.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (filterStatus === '' || contract.status === filterStatus) // Apply filter
+    )
+    .slice(0, 3); // Show only the most recent three contracts
 
   return (
     <div className="min-h-screen bg-gray-100">

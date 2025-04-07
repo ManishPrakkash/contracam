@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from '../components/Navigation';
 
 const Settings = () => {
-  const [profileImage, setProfileImage] = useState('./assets/pic.jpg');
+  const [profileImage, setProfileImage] = useState(
+    localStorage.getItem('profileImage') || './assets/pic.jpg'
+  );
   const [previewImage, setPreviewImage] = useState(profileImage);
+
+  useEffect(() => {
+    localStorage.setItem('lastVisitedPage', 'settings'); // Store the current page in localStorage
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -15,6 +21,7 @@ const Settings = () => {
 
   const handleSaveImage = () => {
     setProfileImage(previewImage);
+    localStorage.setItem('profileImage', previewImage); // Save the profile image to localStorage
     alert('Profile picture updated successfully!');
   };
 

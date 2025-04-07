@@ -9,30 +9,16 @@ const ContractHistory = () => {
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
 
   useEffect(() => {
-    // Mock data for scanned documents
-    const mockHistory = [
-      {
-        id: '1',
-        title: 'Employment Contract',
-        dateScanned: '2025-04-01',
-        status: 'Completed',
-        alerts: 2,
-      },
-      {
-        id: '2',
-        title: 'Lease Agreement',
-        dateScanned: '2025-04-02',
-        status: 'Completed',
-        alerts: 0,
-      },
-      {
-        id: '3',
-        title: 'Service Agreement',
-        dateScanned: '2025-04-03',
-        status: 'Processing',
-        alerts: 1,
-      },
-    ];
+    localStorage.setItem('lastVisitedPage', 'history'); // Store the current page in localStorage
+    const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
+    const mockHistory = history.map((item, index) => ({
+      id: `${index + 1}`,
+      title: item.name,
+      dateScanned: new Date().toLocaleDateString(),
+      status: 'Completed',
+      alerts: 0,
+      thumbnail: item.thumbnail, // Use the saved thumbnail
+    }));
 
     setHistory(mockHistory);
   }, []);
@@ -41,6 +27,16 @@ const ContractHistory = () => {
     setFilterStatus((prevStatus) =>
       prevStatus === 'Processing' ? 'Completed' : prevStatus === 'Completed' ? '' : 'Processing'
     ); // Toggle between "Processing", "Completed", and "Show All"
+  };
+
+  const deleteContract = (id) => {
+    if (window.confirm('Are you sure you want to delete this contract?')) {
+      if (window.confirm('This action is irreversible. Confirm delete?')) {
+        const updatedHistory = history.filter((doc) => doc.id !== id);
+        setHistory(updatedHistory);
+        localStorage.setItem('ocrHistory', JSON.stringify(updatedHistory));
+      }
+    }
   };
 
   const filteredHistory = history.filter(
@@ -102,7 +98,7 @@ const ContractHistory = () => {
                   <div>Title</div>
                   <div>Date Scanned</div>
                   <div>Status</div>
-                  <div>Actions</div>
+                  <div className="text-center">Actions</div> {/* Center-align actions heading */}
                 </div>
                 <dl>
                   {filteredHistory.length > 0 ? (
@@ -130,12 +126,20 @@ const ContractHistory = () => {
                           )}
                         </dd>
                         <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
-                          <Link
-                            to={`/analysis-summary/${doc.id}`}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-                          >
-                            Open
-                          </Link>
+                          <div className="flex justify-center space-x-2"> {/* Center-align buttons */}
+                            <Link
+                              to={`/analysis-summary/${doc.id}`}
+                              className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                            >
+                              Open
+                            </Link>
+                            <button
+                              onClick={() => deleteContract(doc.id)}
+                              className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </dd>
                       </div>
                     ))

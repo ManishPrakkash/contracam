@@ -1,16 +1,22 @@
 // src/pages/UploadContract.jsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { FaFileUpload, FaTrash, FaExclamationCircle } from 'react-icons/fa';
 import Navigation from '../components/Navigation';
+import Tesseract from 'tesseract.js'; // Import OCR library
 
 const UploadContract = () => {
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [ocrResults, setOcrResults] = useState([]); // Store OCR results
   
+  useEffect(() => {
+    localStorage.setItem('lastVisitedPage', 'upload'); // Store the current page in localStorage
+  }, []);
+
   const onDrop = useCallback((acceptedFiles) => {
     // Check if they're images
     const imageFiles = acceptedFiles.filter(file => 
@@ -47,28 +53,48 @@ const UploadContract = () => {
     newFiles.splice(index, 1);
     setFiles(newFiles);
   };
-  
+
+  const handleOCR = async (file) => {
+    try {
+      const { data: { text } } = await Tesseract.recognize(file, 'eng');
+      return text;
+    } catch (error) {
+      console.error('OCR failed:', error);
+      return '';
+    }
+  };
+
   const handleSubmit = async () => {
     if (files.length === 0) {
       setError('Please upload at least one image to process');
       return;
     }
-    
+
     setUploading(true);
-    
     try {
-      // In a real app, this would be an API call to upload files
-      // For demo purposes, simulate a successful upload after a delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Clean up preview URLs
-      files.forEach(file => URL.revokeObjectURL(file.preview));
-      
-      // Redirect to the analysis page (with a mock ID)
-      navigate('/analysis/new-contract-123');
-      setUploading(false); // Ensure uploading state is reset
+      const results = await Promise.all(
+        files.map(async (file) => ({
+          name: file.name,
+          text: await handleOCR(file),
+          thumbnail: file.preview, // Save the preview of the first page
+        }))
+      );
+
+      const newContract = {
+        id: `${Date.now()}`, // Unique ID
+        name: files[0].name, // Use the first file's name
+        text: results.map((result) => result.text).join('\n'), // Combine all OCR results
+        thumbnail: files[0].preview, // Use the first page's preview as the thumbnail
+      };
+
+      const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
+      history.push(newContract); // Add the new contract to history
+      localStorage.setItem('ocrHistory', JSON.stringify(history));
+
+      navigate(`/analysis-summary/${history.length}`); // Navigate to the new contract's summary
     } catch (err) {
-      setError('Failed to upload files. Please try again.');
+      setError('Failed to process files. Please try again.');
+    } finally {
       setUploading(false);
     }
   };

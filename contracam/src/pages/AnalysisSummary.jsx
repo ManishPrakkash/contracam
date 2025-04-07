@@ -13,167 +13,34 @@ const AnalysisSummary = () => {
   const [expandedSections, setExpandedSections] = useState({});
 
   useEffect(() => {
-    // In a real app, this would be an API call to fetch the contract details
-    // Mock data for now
+    localStorage.setItem('lastVisitedPage', `analysis-summary/${id}`); // Store the current page in localStorage
     const fetchContractDetails = async () => {
+      setLoading(true);
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
+        const contractDetails = history.find((_, index) => `${index + 1}` === id);
 
-        // Mock contract data
-        const mockContracts = [
-          {
-            id: '1',
-            title: 'Employment Contract',
-            uploadDate: '2025-04-01',
+        if (contractDetails) {
+          setContract({
+            id,
+            title: contractDetails.name,
+            uploadDate: new Date().toLocaleDateString(),
             status: 'Completed',
-            pages: 5,
-            thumbnail: sampleImage,
-            confidenceScore: 98,
-            alertsCount: 2,
-            summary: 'This is a standard employment contract between Employer Inc. and an employee. It includes terms for compensation, benefits, work responsibilities, and termination conditions.',
-            keyPoints: [
-              'Employment term begins on May 1, 2025 and continues until terminated',
-              'Base salary of $85,000 per year, paid bi-weekly',
-              'Two weeks of paid vacation annually',
-              '401(k) retirement plan with 3% employer match',
-              'Confidentiality and non-compete clauses included'
-            ],
-            detailedSections: [
-              {
-                title: 'Compensation and Benefits',
-                content: 'Employee will receive a base salary of $85,000 per year, paid bi-weekly. Benefits include health insurance (medical, dental, vision), two weeks of paid vacation annually, sick leave as needed, and a 401(k) retirement plan with 3% employer match.',
-                alerts: []
-              },
-              {
-                title: 'Term and Termination',
-                content: 'Employment begins on May 1, 2025 and continues until terminated by either party. Either party may terminate the employment with 2 weeks written notice. Employer may terminate without notice for cause.',
-                alerts: []
-              },
-              {
-                title: 'Non-Compete Clause',
-                content: 'Employee agrees not to work for any direct competitor for a period of 12 months after termination of employment within a 50-mile radius of Employer\'s business locations.',
-                alerts: [
-                  {
-                    level: 'warning',
-                    message: 'Non-compete clauses may have enforceability limitations in some jurisdictions'
-                  }
-                ]
-              },
-              {
-                title: 'Intellectual Property',
-                content: 'All work product, inventions, and intellectual property created during employment belongs to the Employer. Employee agrees to assign all rights to the Employer.',
-                alerts: []
-              },
-              {
-                title: 'Dispute Resolution',
-                content: 'Any disputes arising from this agreement will be resolved through binding arbitration rather than court proceedings.',
-                alerts: [
-                  {
-                    level: 'critical',
-                    message: 'Mandatory arbitration clause limits your right to pursue legal action in court'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            id: '2',
-            title: 'Lease Agreement',
-            uploadDate: '2025-04-02',
-            status: 'Completed',
-            pages: 3,
-            thumbnail: sampleImage,
-            confidenceScore: 95,
+            pages: history.length, // Dynamically set the number of pages
+            thumbnail: contractDetails.thumbnail, // Use the saved thumbnail
+            confidenceScore: 100,
             alertsCount: 0,
-            summary: 'This is a lease agreement between a landlord and a tenant. It includes terms for rent, security deposit, and maintenance responsibilities.',
-            keyPoints: [
-              'Lease term begins on June 1, 2025 and ends on May 31, 2026',
-              'Monthly rent of $1,200, due on the 1st of each month',
-              'Security deposit of $1,200 required',
-              'Tenant responsible for utilities and minor maintenance',
-              'Landlord responsible for major repairs'
-            ],
-            detailedSections: [
-              {
-                title: 'Rent and Payment',
-                content: 'Tenant agrees to pay $1,200 per month in rent, due on the 1st of each month. Late payments will incur a $50 fee.',
-                alerts: []
-              },
-              {
-                title: 'Security Deposit',
-                content: 'Tenant will provide a security deposit of $1,200, which will be returned at the end of the lease term, less any deductions for damages.',
-                alerts: []
-              },
-              {
-                title: 'Maintenance Responsibilities',
-                content: 'Tenant is responsible for minor maintenance, such as changing light bulbs and unclogging drains. Landlord is responsible for major repairs, such as plumbing and electrical issues.',
-                alerts: []
-              },
-              {
-                title: 'Termination and Renewal',
-                content: 'Lease will automatically terminate on May 31, 2026. Tenant may request renewal with 30 days written notice.',
-                alerts: []
-              },
-              {
-                title: 'Dispute Resolution',
-                content: 'Any disputes arising from this agreement will be resolved through mediation before pursuing legal action.',
-                alerts: []
-              }
-            ]
-          },
-          {
-            id: '3',
-            title: 'Service Agreement',
-            uploadDate: '2025-04-03',
-            status: 'Processing',
-            pages: 7,
-            thumbnail: sampleImage,
-            confidenceScore: 90,
-            alertsCount: 0,
-            summary: 'This is a service agreement between a client and a service provider. It includes terms for scope of work, payment, and confidentiality.',
-            keyPoints: [
-              'Service provider will deliver services as outlined in the attached scope of work',
-              'Client agrees to pay $5,000 upon completion of services',
-              'Confidentiality agreement prohibits disclosure of client information',
-              'Agreement is effective from April 1, 2025 to March 31, 2026',
-              'Either party may terminate the agreement with 30 days written notice'
-            ],
-            detailedSections: [
-              {
-                title: 'Scope of Work',
-                content: 'Service provider will deliver services as outlined in the attached scope of work. Any changes to the scope must be agreed upon in writing.',
-                alerts: []
-              },
-              {
-                title: 'Payment Terms',
-                content: 'Client agrees to pay $5,000 upon completion of services. Late payments will incur a 5% fee.',
-                alerts: []
-              },
-              {
-                title: 'Confidentiality',
-                content: 'Both parties agree to maintain confidentiality of all information disclosed during the term of this agreement.',
-                alerts: []
-              },
-              {
-                title: 'Termination',
-                content: 'Either party may terminate the agreement with 30 days written notice. Termination does not relieve either party of obligations incurred prior to termination.',
-                alerts: []
-              },
-              {
-                title: 'Dispute Resolution',
-                content: 'Any disputes arising from this agreement will be resolved through arbitration.',
-                alerts: []
-              }
-            ]
-          }
-        ];
-
-        const contractDetails = mockContracts.find(contract => contract.id === id);
-        setContract(contractDetails);
-        setLoading(false);
+            summary: contractDetails.text,
+            keyPoints: [], // Add logic to extract key points if needed
+            detailedSections: [], // Add logic to populate detailed sections if needed
+          });
+        } else {
+          setContract(null); // Handle case where contract is not found
+        }
       } catch (error) {
         console.error('Error fetching contract details:', error);
+        setContract(null);
+      } finally {
         setLoading(false);
       }
     };

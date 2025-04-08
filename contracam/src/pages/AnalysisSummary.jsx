@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { FaDownload, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaCheck } from 'react-icons/fa';
 import Navigation from '../components/Navigation';
 import sampleImage from '../assets/sample.png'; // Import the sample image
+import jsPDF from 'jspdf'; // Ensure this import is correct
 
 const AnalysisSummary = () => {
   const { id } = useParams();
@@ -30,39 +31,7 @@ const AnalysisSummary = () => {
           alertsCount: contractDetails.alerts || 0, // Fallback for missing alerts
           summary: contractDetails.text || 'No summary available.', // Fallback for missing text
           keyPoints: contractDetails.keyPoints || [], // Fallback for missing key points
-          detailedSections: [
-            {
-              title: 'Payment Terms',
-              content: 'The payment terms specify the due dates and penalties for late payments.',
-              alerts: [
-                { level: 'critical', message: 'Late payment penalty exceeds 10% of the total amount.' },
-              ],
-            },
-            {
-              title: 'Termination Clause',
-              content: 'The termination clause outlines the conditions under which the contract can be terminated.',
-              alerts: [
-                { level: 'warning', message: 'Termination notice period is less than 30 days.' },
-              ],
-            },
-            {
-              title: 'Confidentiality Agreement',
-              content: 'This section ensures that both parties agree to keep the contract terms confidential.',
-              alerts: [],
-            },
-            {
-              title: 'Dispute Resolution',
-              content: 'The dispute resolution clause specifies arbitration as the preferred method.',
-              alerts: [
-                { level: 'critical', message: 'Arbitration location is not specified.' },
-              ],
-            },
-            {
-              title: 'Force Majeure',
-              content: 'This clause protects both parties in case of unforeseen events like natural disasters.',
-              alerts: [],
-            },
-          ],
+          detailedSections: contractDetails.detailedSections || [], // Fallback for missing sections
         });
       } else {
         setContract(null);
@@ -83,8 +52,55 @@ const AnalysisSummary = () => {
   };
 
   const downloadPDF = () => {
-    // In a real app, this would generate and download a PDF
-    alert('PDF download would start here in a real application');
+    if (!contract) return;
+
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text('Contract Analysis Report', 10, 10);
+
+    // Add contract details
+    doc.setFontSize(12);
+    doc.text(`Title: ${contract.title}`, 10, 20);
+    doc.text(`Uploaded Date: ${contract.uploadDate}`, 10, 30);
+    doc.text(`Status: ${contract.status}`, 10, 40);
+    doc.text(`Confidence Score: ${contract.confidenceScore}%`, 10, 50);
+
+    // Add summary
+    doc.setFontSize(14);
+    doc.text('Summary:', 10, 60);
+    doc.setFontSize(12);
+    doc.text(contract.summary, 10, 70, { maxWidth: 190 });
+
+    // Add alerts
+    if (contract.alertsCount > 0) {
+      doc.setFontSize(14);
+      doc.text('Alerts:', 10, 90);
+      doc.setFontSize(12);
+      let y = 100;
+      contract.detailedSections.forEach((section) => {
+        section.alerts.forEach((alert) => {
+          doc.text(`- ${section.title}: ${alert.message}`, 10, y, { maxWidth: 190 });
+          y += 10;
+        });
+      });
+    }
+
+    // Add detailed sections
+    doc.setFontSize(14);
+    doc.text('Detailed Analysis:', 10, 120);
+    let y = 130;
+    contract.detailedSections.forEach((section) => {
+      doc.setFontSize(12);
+      doc.text(`- ${section.title}:`, 10, y);
+      y += 10;
+      doc.text(section.content, 10, y, { maxWidth: 190 });
+      y += 10;
+    });
+
+    // Save the PDF
+    doc.save(`${contract.title}_Analysis_Report.pdf`);
   };
 
   if (loading) {

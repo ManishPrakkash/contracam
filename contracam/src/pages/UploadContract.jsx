@@ -11,7 +11,7 @@ const UploadContract = () => {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
-  const [ocrResults, setOcrResults] = useState([]); // Store OCR results
+  //const [ocrResults, setOcrResults] = useState([]); // Store OCR results
   
   useEffect(() => {
     localStorage.setItem('lastVisitedPage', 'upload'); // Store the current page in localStorage

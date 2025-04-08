@@ -112,11 +112,10 @@ const UploadContract = () => {
       setUploading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation />
-      
       <div className="py-10">
         <header>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -143,7 +142,6 @@ const UploadContract = () => {
                     </div>
                   </div>
                 )}
-                
                 <div
                   {...getRootProps()}
                   className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md ${
@@ -170,13 +168,11 @@ const UploadContract = () => {
                     </p>
                   </div>
                 </div>
-                
                 {files.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-lg font-medium text-gray-900">
                       Uploaded Contract Pages ({files.length}/10)
                     </h3>
-                    
                     <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                       {files.map((file, index) => (
                         <div key={index} className="relative">
@@ -202,7 +198,6 @@ const UploadContract = () => {
                     </div>
                   </div>
                 )}
-                
                 <div className="mt-6">
                   <p className="text-sm text-gray-500">
                     We don't store your contracts - they're processed securely and then deleted.
@@ -210,7 +205,6 @@ const UploadContract = () => {
                   </p>
                 </div>
               </div>
-              
               <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
                 <button
                   type="button"

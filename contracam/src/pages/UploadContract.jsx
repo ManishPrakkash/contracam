@@ -73,26 +73,40 @@ const UploadContract = () => {
     setUploading(true);
     try {
       const results = await Promise.all(
-        files.map(async (file) => ({
-          name: file.name,
-          text: await handleOCR(file),
-          thumbnail: file.preview, // Save the preview of the first page
-        }))
+        files.map(async (file) => {
+          try {
+            const text = await handleOCR(file);
+            return {
+              name: file.name,
+              text: text || 'No text detected', // Fallback for empty OCR results
+              thumbnail: file.preview,
+            };
+          } catch (err) {
+            console.error('Error processing file:', file.name, err); // Debugging: Log file-specific errors
+            return null; // Skip invalid files
+          }
+        })
       );
 
+      const validResults = results.filter((result) => result !== null); // Filter out invalid results
+      if (validResults.length === 0) {
+        throw new Error('No valid files to process');
+      }
+
       const newContract = {
-        id: `${Date.now()}`, // Unique ID
-        name: files[0].name, // Use the first file's name
-        text: results.map((result) => result.text).join('\n'), // Combine all OCR results
-        thumbnail: files[0].preview, // Use the first page's preview as the thumbnail
+        id: `${Date.now()}`,
+        name: files[0].name,
+        text: validResults.map((result) => result.text).join('\n'),
+        thumbnail: files[0].preview,
       };
 
       const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
-      history.push(newContract); // Add the new contract to history
+      history.push(newContract);
       localStorage.setItem('ocrHistory', JSON.stringify(history));
 
-      navigate(`/analysis-summary/${history.length}`); // Navigate to the new contract's summary
+      navigate(`/analysis-summary/${history.length}`);
     } catch (err) {
+      console.error('Error during file processing:', err); // Debugging: Log the error
       setError('Failed to process files. Please try again.');
     } finally {
       setUploading(false);

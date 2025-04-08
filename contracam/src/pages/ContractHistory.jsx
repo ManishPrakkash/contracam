@@ -9,18 +9,23 @@ const ContractHistory = () => {
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
 
   useEffect(() => {
-    localStorage.setItem('lastVisitedPage', 'history'); // Store the current page in localStorage
-    const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
-    const mockHistory = history.map((item, index) => ({
-      id: `${index + 1}`,
-      title: item.name,
-      dateScanned: new Date().toLocaleDateString(),
-      status: 'Completed',
-      alerts: 0,
-      thumbnail: item.thumbnail, // Use the saved thumbnail
-    }));
+    try {
+      localStorage.setItem('lastVisitedPage', 'history'); // Store the current page in localStorage
+      const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
+      const mockHistory = history.map((item, index) => ({
+        id: `${index + 1}`,
+        title: item.name || 'Untitled Contract', // Fallback for missing title
+        dateScanned: new Date().toLocaleDateString(),
+        status: 'Completed',
+        alerts: item.alerts || 0, // Fallback for missing alerts
+        thumbnail: item.thumbnail || sampleImage, // Fallback for missing thumbnail
+      }));
 
-    setHistory(mockHistory);
+      setHistory(mockHistory);
+    } catch (err) {
+      console.error('Error fetching contract history:', err); // Debugging: Log errors
+      setHistory([]);
+    }
   }, []);
 
   const toggleFilter = () => {

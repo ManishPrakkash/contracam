@@ -13,39 +13,34 @@ const AnalysisSummary = () => {
   const [expandedSections, setExpandedSections] = useState({});
 
   useEffect(() => {
-    localStorage.setItem('lastVisitedPage', `analysis-summary/${id}`); // Store the current page in localStorage
-    const fetchContractDetails = async () => {
-      setLoading(true);
-      try {
-        const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
-        const contractDetails = history.find((_, index) => `${index + 1}` === id);
+    try {
+      localStorage.setItem('lastVisitedPage', `analysis-summary/${id}`); // Store the current page in localStorage
+      const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
+      const contractDetails = history.find((_, index) => `${index + 1}` === id);
 
-        if (contractDetails) {
-          setContract({
-            id,
-            title: contractDetails.name,
-            uploadDate: new Date().toLocaleDateString(),
-            status: 'Completed',
-            pages: history.length, // Dynamically set the number of pages
-            thumbnail: contractDetails.thumbnail, // Use the saved thumbnail
-            confidenceScore: 100,
-            alertsCount: 0,
-            summary: contractDetails.text,
-            keyPoints: [], // Add logic to extract key points if needed
-            detailedSections: [], // Add logic to populate detailed sections if needed
-          });
-        } else {
-          setContract(null); // Handle case where contract is not found
-        }
-      } catch (error) {
-        console.error('Error fetching contract details:', error);
+      if (contractDetails) {
+        setContract({
+          id,
+          title: contractDetails.name || 'Untitled Contract', // Fallback for missing title
+          uploadDate: new Date().toLocaleDateString(),
+          status: 'Completed',
+          pages: history.length,
+          thumbnail: contractDetails.thumbnail || sampleImage, // Fallback for missing thumbnail
+          confidenceScore: 100,
+          alertsCount: contractDetails.alerts || 0, // Fallback for missing alerts
+          summary: contractDetails.text || 'No summary available.', // Fallback for missing text
+          keyPoints: contractDetails.keyPoints || [], // Fallback for missing key points
+          detailedSections: contractDetails.detailedSections || [], // Fallback for missing sections
+        });
+      } else {
         setContract(null);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchContractDetails();
+    } catch (err) {
+      console.error('Error fetching contract details:', err); // Debugging: Log the error
+      setContract(null);
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   const toggleSection = (index) => {

@@ -7,20 +7,27 @@ const ContractHistory = () => {
   const [history, setHistory] = useState([]);
   const [filterStatus, setFilterStatus] = useState(''); // State for filter status
   const [searchTerm, setSearchTerm] = useState(''); // State for search term
+  const [contractToDelete, setContractToDelete] = useState(null); // State for the contract to delete
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false); // State for showing the delete confirmation
 
   useEffect(() => {
-    localStorage.setItem('lastVisitedPage', 'history'); // Store the current page in localStorage
-    const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
-    const mockHistory = history.map((item, index) => ({
-      id: `${index + 1}`,
-      title: item.name,
-      dateScanned: new Date().toLocaleDateString(),
-      status: 'Completed',
-      alerts: 0,
-      thumbnail: item.thumbnail, // Use the saved thumbnail
-    }));
+    try {
+      localStorage.setItem('lastVisitedPage', 'history'); // Store the current page in localStorage
+      const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
+      const mockHistory = history.map((item, index) => ({
+        id: `${index + 1}`,
+        title: item.name || 'Untitled Contract', // Fallback for missing title
+        dateScanned: new Date().toLocaleDateString(),
+        status: 'Completed',
+        alerts: item.alerts || 0, // Fallback for missing alerts
+        thumbnail: item.thumbnail || '', // Fallback for missing thumbnail
+      }));
 
-    setHistory(mockHistory);
+      setHistory(mockHistory);
+    } catch (err) {
+      console.error('Error fetching contract history:', err); // Debugging: Log errors
+      setHistory([]);
+    }
   }, []);
 
   const toggleFilter = () => {
@@ -29,14 +36,17 @@ const ContractHistory = () => {
     ); // Toggle between "Processing", "Completed", and "Show All"
   };
 
-  const deleteContract = (id) => {
-    if (window.confirm('Are you sure you want to delete this contract?')) {
-      if (window.confirm('This action is irreversible. Confirm delete?')) {
-        const updatedHistory = history.filter((doc) => doc.id !== id);
-        setHistory(updatedHistory);
-        localStorage.setItem('ocrHistory', JSON.stringify(updatedHistory));
-      }
-    }
+  const confirmDeleteContract = (id) => {
+    setContractToDelete(id);
+    setShowConfirmDelete(true);
+  };
+
+  const deleteContract = () => {
+    const updatedHistory = history.filter((doc) => doc.id !== contractToDelete);
+    setHistory(updatedHistory);
+    localStorage.setItem('ocrHistory', JSON.stringify(updatedHistory));
+    setShowConfirmDelete(false);
+    setContractToDelete(null);
   };
 
   const filteredHistory = history.filter(
@@ -134,7 +144,7 @@ const ContractHistory = () => {
                               Open
                             </Link>
                             <button
-                              onClick={() => deleteContract(doc.id)}
+                              onClick={() => confirmDeleteContract(doc.id)}
                               className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                             >
                               Delete
@@ -154,6 +164,32 @@ const ContractHistory = () => {
           </div>
         </main>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-lg font-bold text-gray-900">Confirm Delete</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Are you sure you want to delete this contract? This action cannot be undone.
+            </p>
+            <div className="mt-4 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowConfirmDelete(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteContract}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -18,26 +18,36 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.setItem('lastVisitedPage', 'dashboard'); // Store the current page in localStorage
-    const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
-    const mockContracts = history
-      .map((item, index) => ({
-        id: `${index + 1}`,
-        title: item.name,
-        uploadDate: new Date().toLocaleDateString(),
-        status: 'Completed',
-        thumbnail: item.thumbnail, // Use the saved thumbnail
-        alertsCount: 0,
-        summary: item.text.slice(0, 100) + '...', // Short summary
-      }))
-      .reverse(); // Reverse to show most recently added contracts first
-    setContracts(mockContracts);
-    setStats({
-      totalContracts: mockContracts.length,
-      alertsFound: 0,
-      pendingContracts: 0,
-    });
-  }, [localStorage.getItem('ocrHistory')]); // Re-run when history changes
+    try {
+      localStorage.setItem('lastVisitedPage', 'dashboard'); // Store the current page in localStorage
+      const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
+      const mockContracts = history
+        .map((item, index) => ({
+          id: `${index + 1}`,
+          title: item.name || 'Untitled Contract', // Fallback for missing title
+          uploadDate: new Date().toLocaleDateString(),
+          status: item.status || 'Completed', // Fallback for missing status
+          thumbnail: item.thumbnail || sampleImage, // Fallback for missing thumbnail
+          alertsCount: item.alerts || 0, // Fallback for missing alerts
+          summary: (item.text || 'No summary available').slice(0, 100) + '...', // Fallback for missing text
+        }))
+        .reverse(); // Reverse to show most recently added contracts first
+      setContracts(mockContracts);
+      setStats({
+        totalContracts: mockContracts.length,
+        alertsFound: mockContracts.reduce((acc, contract) => acc + contract.alertsCount, 0),
+        pendingContracts: mockContracts.filter((contract) => contract.status === 'Processing').length,
+      });
+    } catch (err) {
+      console.error('Error initializing dashboard:', err); // Debugging: Log errors
+      setContracts([]);
+      setStats({
+        totalContracts: 0,
+        alertsFound: 0,
+        pendingContracts: 0,
+      });
+    }
+  }, []); // Removed dependency on `localStorage.getItem('ocrHistory')` to avoid unnecessary re-renders
 
   const handleLogout = () => {
     localStorage.removeItem('user');

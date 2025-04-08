@@ -20,27 +20,29 @@ const Login = ({ setIsAuthenticated = () => {} }) => {
       return;
     }
     
-    // In a real app, this would be an API call
-    // For now, we'll just simulate authentication
-    
-    // Mock successful authentication
-    const mockUser = {
-      id: '123',
-      name: isLogin ? 'Demo User' : name,
-      email,
-    };
-    
-    const mockToken = 'mock-jwt-token';
-    
-    // Save to localStorage
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    localStorage.setItem('token', mockToken);
-    
-    // Update auth state
-    setIsAuthenticated(true);
-    
-    // Redirect to dashboard
-    navigate('/dashboard');
+    try {
+      // Mock successful authentication
+      const mockUser = {
+        id: '123',
+        name: isLogin ? 'Demo User' : name,
+        email,
+      };
+  
+      const mockToken = 'mock-jwt-token';
+  
+      // Save to localStorage
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('token', mockToken);
+  
+      // Update auth state
+      setIsAuthenticated(true);
+  
+      // Redirect to dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Error during login:', err); // Debugging: Log errors
+      setError('An unexpected error occurred. Please try again.');
+    }
   };
 
   const handleLogout = () => {

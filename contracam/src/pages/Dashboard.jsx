@@ -26,7 +26,7 @@ const Dashboard = () => {
           id: `${index + 1}`,
           title: item.name || 'Untitled Contract', // Fallback for missing title
           uploadDate: new Date().toLocaleDateString(),
-          status: 'Completed',
+          status: item.status || 'Completed', // Fallback for missing status
           thumbnail: item.thumbnail || sampleImage, // Fallback for missing thumbnail
           alertsCount: item.alerts || 0, // Fallback for missing alerts
           summary: (item.text || 'No summary available').slice(0, 100) + '...', // Fallback for missing text

@@ -30,7 +30,39 @@ const AnalysisSummary = () => {
           alertsCount: contractDetails.alerts || 0, // Fallback for missing alerts
           summary: contractDetails.text || 'No summary available.', // Fallback for missing text
           keyPoints: contractDetails.keyPoints || [], // Fallback for missing key points
-          detailedSections: contractDetails.detailedSections || [], // Fallback for missing sections
+          detailedSections: [
+            {
+              title: 'Payment Terms',
+              content: 'The payment terms specify the due dates and penalties for late payments.',
+              alerts: [
+                { level: 'critical', message: 'Late payment penalty exceeds 10% of the total amount.' },
+              ],
+            },
+            {
+              title: 'Termination Clause',
+              content: 'The termination clause outlines the conditions under which the contract can be terminated.',
+              alerts: [
+                { level: 'warning', message: 'Termination notice period is less than 30 days.' },
+              ],
+            },
+            {
+              title: 'Confidentiality Agreement',
+              content: 'This section ensures that both parties agree to keep the contract terms confidential.',
+              alerts: [],
+            },
+            {
+              title: 'Dispute Resolution',
+              content: 'The dispute resolution clause specifies arbitration as the preferred method.',
+              alerts: [
+                { level: 'critical', message: 'Arbitration location is not specified.' },
+              ],
+            },
+            {
+              title: 'Force Majeure',
+              content: 'This clause protects both parties in case of unforeseen events like natural disasters.',
+              alerts: [],
+            },
+          ],
         });
       } else {
         setContract(null);

@@ -4,13 +4,13 @@ const hf = new HfInference(import.meta.env.VITE_HUGGINGFACE_API_KEY);
 
 export const summarizeText = async (inputText) => {
   try {
-    const result = await hf.summarization({
+    const { summary_text } = await hf.summarization({
       model: 'facebook/bart-large-cnn', // Use a summarization model
       inputs: inputText,
     });
-    return result.summary_text; // Adjust to the correct response field
+    return summary_text; // Adjust to the correct response field
   } catch (error) {
-    console.error('Error during summarization:', error);
+    console.error('Error during summarization:', error); // Log the error
     return 'Error summarizing text.';
   }
 };

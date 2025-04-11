@@ -224,9 +224,11 @@ const AnalysisSummary = () => {
                   <div className="mt-4">
                     <h4 className="text-sm font-medium text-gray-900">Key Points:</h4>
                     <ul className="mt-2 text-sm text-gray-500 list-disc pl-5 space-y-1">
-                      {contract.keyPoints.map((point, index) => (
-                        <li key={index}>{point}</li>
-                      ))}
+                      {contract.keyPoints?.length ? (
+                        contract.keyPoints.map((point, index) => <li key={index}>{point}</li>)
+                      ) : (
+                        <li>No key points available.</li>
+                      )}
                     </ul>
                   </div>
                 )}

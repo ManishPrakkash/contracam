@@ -6,6 +6,7 @@ import { FaFileUpload, FaTrash, FaExclamationCircle } from 'react-icons/fa';
 import Navigation from '../components/Navigation';
 import Tesseract from 'tesseract.js';
 import { summarizeText } from '../utils/textUtils'; // Import summarization utility
+import { extractKeyPoints } from '../utils/keyPointsExtractor'; // Correct import for key points utility
 
 const UploadContract = () => {
   const navigate = useNavigate();
@@ -58,44 +59,36 @@ const UploadContract = () => {
   };
 
   const handleSubmit = async () => {
-    if (files.length === 0) {
-      setError('Please upload at least one image to process');
-      return;
-    }
+    if (!files.length) return setError('Please upload at least one image to process');
 
     setUploading(true);
     try {
       const results = await Promise.all(
-        files.map(async (file) => {
-          const text = await handleOCR(file);
-          return {
-            name: file.name,
-            text: text || 'No text detected',
-            thumbnail: file.preview,
-          };
-        })
+        files.map(async (file) => ({
+          name: file.name,
+          text: await handleOCR(file) || 'No text detected',
+          thumbnail: file.preview,
+        }))
       );
 
-      const validResults = results.filter((result) => result !== null);
-      if (validResults.length === 0) {
-        throw new Error('No valid files to process');
-      }
-
-      const fullText = validResults.map((result) => result.text).join('\n');
-      const summary = await summarizeText(fullText); // Summarize the OCR text
+      const fullText = results.map((r) => r.text).join('\n');
+      const [summary, keyPoints] = await Promise.all([
+        summarizeText(fullText),
+        extractKeyPoints(fullText), // Generate key points
+      ]);
 
       const newContract = {
         id: `${Date.now()}`,
         name: files[0].name,
         text: fullText,
-        summary, // Store the summarized text
+        summary,
+        keyPoints,
         thumbnail: files[0].preview,
       };
 
       const history = JSON.parse(localStorage.getItem('ocrHistory')) || [];
       history.push(newContract);
       localStorage.setItem('ocrHistory', JSON.stringify(history));
-
       navigate(`/analysis-summary/${history.length}`);
     } catch (err) {
       console.error('Error during file processing:', err);

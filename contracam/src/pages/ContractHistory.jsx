@@ -17,7 +17,7 @@ const ContractHistory = () => {
       const mockHistory = history.map((item, index) => ({
         id: `${index + 1}`,
         title: item.name || 'Untitled Contract', // Fallback for missing title
-        dateScanned: new Date().toLocaleDateString(),
+        dateScanned: item.dateScanned || new Date().toLocaleDateString(), // Use actual scanned date if available
         status: 'Completed',
         alerts: item.alerts || 0, // Fallback for missing alerts
         thumbnail: item.thumbnail || '', // Fallback for missing thumbnail

@@ -29,7 +29,7 @@ const AnalysisSummary = () => {
           thumbnail: contractDetails.thumbnail || sampleImage, // Fallback for missing thumbnail
           confidenceScore: 100,
           alertsCount: contractDetails.alerts || 0, // Fallback for missing alerts
-          summary: contractDetails.text || 'No summary available.', // Fallback for missing text
+          summary: contractDetails.summary || 'No summary available.', // Use summarized text
           keyPoints: contractDetails.keyPoints || [], // Fallback for missing key points
           detailedSections: contractDetails.detailedSections || [], // Fallback for missing sections
         });

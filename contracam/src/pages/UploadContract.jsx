@@ -4,54 +4,47 @@ import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { FaFileUpload, FaTrash, FaExclamationCircle } from 'react-icons/fa';
 import Navigation from '../components/Navigation';
-import Tesseract from 'tesseract.js'; // Import OCR library
+import Tesseract from 'tesseract.js';
+import { summarizeText } from '../utils/textUtils'; // Import summarization utility
 
 const UploadContract = () => {
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
-  //const [ocrResults, setOcrResults] = useState([]); // Store OCR results
-  
+
   useEffect(() => {
-    localStorage.setItem('lastVisitedPage', 'upload'); // Store the current page in localStorage
+    localStorage.setItem('lastVisitedPage', 'upload');
   }, []);
 
   const onDrop = useCallback((acceptedFiles) => {
-    // Check if they're images
-    const imageFiles = acceptedFiles.filter(file => 
-      file.type.startsWith('image/')
-    );
-    
+    const imageFiles = acceptedFiles.filter((file) => file.type.startsWith('image/'));
     if (imageFiles.length < acceptedFiles.length) {
       setError('Only image files are allowed');
       return;
     }
-    
-    // Create preview URLs for the images
-    const newFiles = imageFiles.map(file => 
+    const newFiles = imageFiles.map((file) =>
       Object.assign(file, {
-        preview: URL.createObjectURL(file)
+        preview: URL.createObjectURL(file),
       })
     );
-    
-    setFiles(prev => [...prev, ...newFiles]);
+    setFiles((prev) => [...prev, ...newFiles]);
     setError('');
   }, []);
-  
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.tiff', '.bmp']
-    },
-    maxFiles: 10
+    accept: { 'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.tiff', '.bmp'] },
+    maxFiles: 10,
   });
-  
+
   const removeFile = (index) => {
-    const newFiles = [...files];
-    URL.revokeObjectURL(newFiles[index].preview);
-    newFiles.splice(index, 1);
-    setFiles(newFiles);
+    setFiles((prev) => {
+      const newFiles = [...prev];
+      URL.revokeObjectURL(newFiles[index].preview); // Revoke URL after removing the file
+      newFiles.splice(index, 1);
+      return newFiles;
+    });
   };
 
   const handleOCR = async (file) => {
@@ -74,29 +67,28 @@ const UploadContract = () => {
     try {
       const results = await Promise.all(
         files.map(async (file) => {
-          try {
-            const text = await handleOCR(file);
-            return {
-              name: file.name,
-              text: text || 'No text detected', // Fallback for empty OCR results
-              thumbnail: file.preview,
-            };
-          } catch (err) {
-            console.error('Error processing file:', file.name, err); // Debugging: Log file-specific errors
-            return null; // Skip invalid files
-          }
+          const text = await handleOCR(file);
+          return {
+            name: file.name,
+            text: text || 'No text detected',
+            thumbnail: file.preview,
+          };
         })
       );
 
-      const validResults = results.filter((result) => result !== null); // Filter out invalid results
+      const validResults = results.filter((result) => result !== null);
       if (validResults.length === 0) {
         throw new Error('No valid files to process');
       }
 
+      const fullText = validResults.map((result) => result.text).join('\n');
+      const summary = await summarizeText(fullText); // Summarize the OCR text
+
       const newContract = {
         id: `${Date.now()}`,
         name: files[0].name,
-        text: validResults.map((result) => result.text).join('\n'),
+        text: fullText,
+        summary, // Store the summarized text
         thumbnail: files[0].preview,
       };
 
@@ -106,7 +98,7 @@ const UploadContract = () => {
 
       navigate(`/analysis-summary/${history.length}`);
     } catch (err) {
-      console.error('Error during file processing:', err); // Debugging: Log the error
+      console.error('Error during file processing:', err);
       setError('Failed to process files. Please try again.');
     } finally {
       setUploading(false);

@@ -20,6 +20,14 @@ const AnalysisSummary = () => {
       const contractDetails = history.find((_, index) => `${index + 1}` === id);
 
       if (contractDetails) {
+        const totalAlerts = contractDetails.detailedSections?.reduce(
+          (count, section) => count + section.alerts.length,
+          0
+        ) || 0;
+
+        // Adjust confidence score dynamically based on alerts
+        const confidenceScore = Math.max(100 - totalAlerts * 5, 0); // Deduct 5% per alert, minimum 0%
+
         setContract({
           id,
           title: contractDetails.name || 'Untitled Contract', // Fallback for missing title
@@ -27,11 +35,48 @@ const AnalysisSummary = () => {
           status: 'Completed',
           pages: history.length,
           thumbnail: contractDetails.thumbnail || sampleImage, // Fallback for missing thumbnail
-          confidenceScore: 100,
-          alertsCount: contractDetails.alerts || 0, // Fallback for missing alerts
+          confidenceScore, // Dynamically calculated confidence score
+          alertsCount: totalAlerts, // Total alerts count
           summary: contractDetails.summary || 'No summary available.', // Use summarized text
           keyPoints: contractDetails.keyPoints || [], // Fallback for missing key points
-          detailedSections: contractDetails.detailedSections || [], // Fallback for missing sections
+          detailedSections: contractDetails.detailedSections || [
+            {
+              title: 'Payment Terms',
+              content: 'The payment terms specify the amount and schedule of payments.',
+              alerts: [
+                { message: 'Payment schedule is missing.', level: 'critical' },
+                { message: 'Late payment penalties are not defined.', level: 'warning' },
+              ],
+            },
+            {
+              title: 'Contract Duration',
+              content: 'The contract duration specifies the start and end dates.',
+              alerts: [
+                { message: 'End date is not clearly defined.', level: 'critical' },
+              ],
+            },
+            {
+              title: 'Confidentiality Clause',
+              content: 'The confidentiality clause outlines the handling of sensitive information.',
+              alerts: [
+                { message: 'Confidentiality clause is missing.', level: 'critical' },
+              ],
+            },
+            {
+              title: 'Termination Clause',
+              content: 'The termination clause specifies conditions for ending the contract.',
+              alerts: [
+                { message: 'Termination conditions are ambiguous.', level: 'warning' },
+              ],
+            },
+            {
+              title: 'Dispute Resolution',
+              content: 'The dispute resolution clause specifies how disputes will be handled.',
+              alerts: [
+                { message: 'Arbitration process is not defined.', level: 'warning' },
+              ],
+            },
+          ], // Mock detailed sections with alerts
         });
       } else {
         setContract(null);

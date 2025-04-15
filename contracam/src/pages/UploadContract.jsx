@@ -72,10 +72,21 @@ const UploadContract = () => {
       );
 
       const fullText = results.map((r) => r.text).join('\n');
-      const [summary, keyPoints] = await Promise.all([
-        summarizeText(fullText),
-        extractKeyPoints(fullText), // Generate key points
-      ]);
+
+      let summary = 'No summary available.';
+      let keyPoints = ['No key points available.'];
+
+      try {
+        summary = await summarizeText(fullText);
+      } catch (summarizationError) {
+        console.error('Error during summarization:', summarizationError);
+      }
+
+      try {
+        keyPoints = await extractKeyPoints(fullText);
+      } catch (keyPointsError) {
+        console.error('Error extracting key points:', keyPointsError);
+      }
 
       const newContract = {
         id: `${Date.now()}`,

@@ -100,48 +100,83 @@ const AnalysisSummary = () => {
     if (!contract) return;
 
     const doc = new jsPDF();
+    let y = 10; // Start vertical position
 
     // Add title
     doc.setFontSize(18);
-    doc.text('Contract Analysis Report', 10, 10);
+    doc.text('Contract Analysis Report', 10, y);
+    y += 10; // Add spacing
 
     // Add contract details
     doc.setFontSize(12);
-    doc.text(`Title: ${contract.title}`, 10, 20);
-    doc.text(`Uploaded Date: ${contract.uploadDate}`, 10, 30);
-    doc.text(`Status: ${contract.status}`, 10, 40);
-    doc.text(`Confidence Score: ${contract.confidenceScore}%`, 10, 50);
+    doc.text(`Title: ${contract.title}`, 10, y);
+    y += 10;
+    doc.text(`Uploaded Date: ${contract.uploadDate}`, 10, y);
+    y += 10;
+    doc.text(`Status: ${contract.status}`, 10, y);
+    y += 10;
+    doc.text(`Confidence Score: ${contract.confidenceScore}%`, 10, y);
+    y += 10;
 
     // Add summary
     doc.setFontSize(14);
-    doc.text('Summary:', 10, 60);
+    doc.text('Summary:', 10, y);
+    y += 10;
     doc.setFontSize(12);
-    doc.text(contract.summary, 10, 70, { maxWidth: 190 });
+    const summaryLines = doc.splitTextToSize(contract.summary, 190); // Wrap text to fit within the page width
+    summaryLines.forEach((line) => {
+      doc.text(line, 10, y);
+      y += 10; // Add spacing for each line
+    });
+
+    // Add key points
+    if (contract.keyPoints?.length) {
+      doc.setFontSize(14);
+      doc.text('Key Points:', 10, y);
+      y += 10;
+      doc.setFontSize(12);
+      contract.keyPoints.forEach((point) => {
+        const keyPointLines = doc.splitTextToSize(`- ${point}`, 190);
+        keyPointLines.forEach((line) => {
+          doc.text(line, 10, y);
+          y += 10;
+        });
+      });
+    }
 
     // Add alerts
     if (contract.alertsCount > 0) {
       doc.setFontSize(14);
-      doc.text('Alerts:', 10, 90);
+      doc.text('Alerts:', 10, y);
+      y += 10;
       doc.setFontSize(12);
-      let y = 100;
       contract.detailedSections.forEach((section) => {
         section.alerts.forEach((alert) => {
-          doc.text(`- ${section.title}: ${alert.message}`, 10, y, { maxWidth: 190 });
-          y += 10;
+          const alertLines = doc.splitTextToSize(`- ${section.title}: ${alert.message}`, 190);
+          alertLines.forEach((line) => {
+            doc.text(line, 10, y);
+            y += 10;
+          });
         });
       });
     }
 
     // Add detailed sections
     doc.setFontSize(14);
-    doc.text('Detailed Analysis:', 10, 120);
-    let y = 130;
+    doc.text('Detailed Analysis:', 10, y);
+    y += 10;
     contract.detailedSections.forEach((section) => {
       doc.setFontSize(12);
-      doc.text(`- ${section.title}:`, 10, y);
-      y += 10;
-      doc.text(section.content, 10, y, { maxWidth: 190 });
-      y += 10;
+      const sectionTitleLines = doc.splitTextToSize(`- ${section.title}:`, 190);
+      sectionTitleLines.forEach((line) => {
+        doc.text(line, 10, y);
+        y += 10;
+      });
+      const sectionContentLines = doc.splitTextToSize(section.content, 190);
+      sectionContentLines.forEach((line) => {
+        doc.text(line, 10, y);
+        y += 10;
+      });
     });
 
     // Save the PDF
@@ -262,9 +297,7 @@ const AnalysisSummary = () => {
                     )}
                   </button>
                 </div>
-                <p className="mt-2 text-sm text-gray-500">
-                  {contract.summary}
-                </p>
+                <p className="mt-2 text-sm text-gray-500">{contract.summary}</p>
                 {expandedSummary && (
                   <div className="mt-4">
                     <h4 className="text-sm font-medium text-gray-900">Key Points:</h4>
@@ -277,15 +310,16 @@ const AnalysisSummary = () => {
                     </ul>
                   </div>
                 )}
-              </div>
-              <div className="px-4 py-3 bg-gray-50 sm:px-6 flex justify-end">
-                <button
-                  type="button"
-                  onClick={downloadPDF}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-                >
-                  <FaDownload className="mr-2" /> Download Report
-                </button>
+                {/* Download Button */}
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={downloadPDF}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                  >
+                    <FaDownload className="mr-2" /> Download Analysis as PDF
+                  </button>
+                </div>
               </div>
             </div>
 
